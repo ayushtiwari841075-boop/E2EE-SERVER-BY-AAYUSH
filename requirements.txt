@@ -3,4 +3,4 @@ selenium==4.15.0
 cryptography==41.0.7
 requests==2.31.0
 pytz==2023.3
-pathlib2==2.3.7.post1
+pathlib==1.0.1
