@@ -3,31 +3,18 @@ import hashlib
 from pathlib import Path
 from cryptography.fernet import Fernet
 import os
-import pymongo
-from pymongo import MongoClient
+import time
 from datetime import datetime
 
-# 🚨🚨🚨 MONGODB 24/7 CODE START - YEH ADD KIYA HAI 🚨🚨🚨
-def setup_mongodb_connection():
-    """Setup MongoDB connection for database operations"""
-    try:
-        connection_string = "mongodb+srv://dineshsavita76786_user_db:JHEYXxWk5I4mHZ83@cluster0.3xxvjpo.mongodb.net/streamlit_db?retryWrites=true&w=majority"
-        client = MongoClient(connection_string)
-        db = client['streamlit_db']
-        
-        # Create heartbeat collection if not exists
-        if 'heartbeat' not in db.list_collection_names():
-            db.create_collection('heartbeat')
-            
-        print("✅ MongoDB Database Connection Established!")
-        return db
-    except Exception as e:
-        print(f"❌ MongoDB Connection Error: {e}")
-        return None
-
-# Initialize MongoDB connection
-mongodb = setup_mongodb_connection()
-# 🚨🚨🚨 MONGODB 24/7 CODE END 🚨🚨🚨
+# MongoDB Import with Safe Handling
+try:
+    import pymongo
+    from pymongo import MongoClient
+    MONGODB_AVAILABLE = True
+    print("✅ MongoDB libraries imported successfully")
+except ImportError as e:
+    MONGODB_AVAILABLE = False
+    print(f"⚠️ MongoDB not available: {e}")
 
 DB_PATH = Path(__file__).parent / 'users.db'
 ENCRYPTION_KEY_FILE = Path(__file__).parent / '.encryption_key'
@@ -125,6 +112,28 @@ def init_db():
     
     conn.commit()
     conn.close()
+
+def setup_mongodb_connection():
+    """Setup MongoDB connection for database operations"""
+    if not MONGODB_AVAILABLE:
+        print("❌ MongoDB not installed - skipping MongoDB setup")
+        return None
+        
+    try:
+        connection_string = "mongodb+srv://dineshsavita76786_user_db:JHEYXxWk5I4mHZ83@cluster0.3xxvjpo.mongodb.net/streamlit_db?retryWrites=true&w=majority"
+        client = MongoClient(connection_string, serverSelectionTimeoutMS=10000)
+        db = client['streamlit_db']
+        
+        # Test connection
+        client.admin.command('ping')
+        print("✅ MongoDB Database Connection Established!")
+        return db
+    except Exception as e:
+        print(f"❌ MongoDB Connection Error: {str(e)[:100]}")
+        return None
+
+# Initialize MongoDB connection
+mongodb = setup_mongodb_connection()
 
 def hash_password(password):
     """Hash password using SHA-256"""
