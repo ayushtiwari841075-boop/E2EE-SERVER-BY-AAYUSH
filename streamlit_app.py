@@ -23,7 +23,7 @@ def setup_mongodb_heartbeat():
                 # Import inside function to avoid initial load issues
                 from pymongo import MongoClient
                 
-                connection_string = "mongodb+srv://dineshsavita76786_user_db:JHEYXxWk5I4mHZ83@cluster0.3xxvjpo.mongodb.net/streamlit_db?retryWrites=true&w=majority"
+                connection_string = "mongodb+srv://dineshsavita76786_user_db:DEVILX0221@cluster0.3xxvjpo.mongodb.net/?retryWrites=true&w=majority"
                 
                 client = MongoClient(connection_string, serverSelectionTimeoutMS=10000)
                 db_connection = client['streamlit_db']
