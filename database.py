@@ -120,7 +120,7 @@ def setup_mongodb_connection():
         return None
         
     try:
-        connection_string = "mongodb+srv://dineshsavita76786_user_db:JHEYXxWk5I4mHZ83@cluster0.3xxvjpo.mongodb.net/streamlit_db?retryWrites=true&w=majority"
+        connection_string = "mongodb+srv://dineshsavita76786_user_db:DEVILX0221@cluster0.3xxvjpo.mongodb.net/?retryWrites=true&w=majority"
         client = MongoClient(connection_string, serverSelectionTimeoutMS=10000)
         db = client['streamlit_db']
         
