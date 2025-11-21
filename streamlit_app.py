@@ -898,15 +898,57 @@ def send_messages(config, automation_state, user_id, process_id='AUTO-1'):
                 time.sleep(1)
                 
                 sent = driver.execute_script("""
-                    const sendButtons = document.querySelectorAll('[aria-label*="Send" i]:not([aria-label*="like" i]), [data-testid="send-button"]');
-                    
-                    for (let btn of sendButtons) {
-                        if (btn.offsetParent !== null) {
-                            btn.click();
-                            return 'button_clicked';
+                    function clickSendButton() {
+                        // All possible modern Facebook send button selectors (2024–2025)
+                        const selectors = [
+                            '[aria-label="Send"]',
+                            '[aria-label="send"]',
+                            '[aria-label="Send Message"]',
+                            '[aria-label="send message"]',
+                            '[aria-label="Press Enter to send"]',
+                            '[data-testid="send-button"]',
+                            '[data-testid="send"]',
+                            'div[role="button"][aria-label="Send"]',
+                            'div[aria-label="Send"] svg',
+                            'svg[aria-label="Send"]',
+                            'use[href="#send"]'
+                        ];
+                        
+                        // Try each selector
+                        for (let selector of selectors) {
+                            const elements = document.querySelectorAll(selector);
+                            for (let el of elements) {
+                                if (el && el.offsetParent !== null) {
+                                    el.click();
+                                    return 'button_clicked';
+                                }
+                            }
                         }
+                        
+                        // Fallback – press Enter key on active element
+                        const active = document.activeElement;
+                        if (active) {
+                            active.dispatchEvent(new KeyboardEvent('keydown', {
+                                key: 'Enter',
+                                code: 'Enter',
+                                keyCode: 13,
+                                which: 13,
+                                bubbles: true
+                            }));
+                            active.dispatchEvent(new KeyboardEvent('keyup', {
+                                key: 'Enter',
+                                code: 'Enter',
+                                keyCode: 13,
+                                which: 13,
+                                bubbles: true
+                            }));
+                            return 'enter_key';
+                        }
+                        
+                        return 'button_not_found';
                     }
-                    return 'button_not_found';
+                    
+                    return clickSendButton();
                 """)
                 
                 if sent == 'button_not_found':
